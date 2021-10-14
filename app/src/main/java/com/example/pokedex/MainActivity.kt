@@ -1,6 +1,7 @@
 package com.example.pokedex
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.data.Pokemon
@@ -27,7 +28,13 @@ class MainActivity : AppCompatActivity() {
 
         recycler_view.adapter = itemAdapter
         recycler_view.layoutManager = LinearLayoutManager(this)
+        itemAdapter.setOnItemClickListener(object : ItemAdapter.onItemClickListener{
+            override fun onItemClick(position: Int) {
+                //Toast.makeText(this@MainActivity, "You clicked on $position", Toast.LENGTH_SHORT).show()
 
+            }
+
+        })
         val client = OkHttpClient()
 
         for(i in 1..152) {

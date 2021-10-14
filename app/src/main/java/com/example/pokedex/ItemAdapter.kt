@@ -16,14 +16,32 @@ class ItemAdapter(
     private val dataset: MutableList<Pokemon>
 ) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
+
+    //Setting up the OnClickListener:
+    private lateinit var mListener : onItemClickListener
+
+    interface onItemClickListener{
+        fun onItemClick(position:Int)
+    }
+
+    fun setOnItemClickListener(listener: onItemClickListener){
+        mListener = listener
+    }
+
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder.
     // Each data item is just an com.example.pokedex.data.Affirmation object.
-    class ItemViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    class ItemViewHolder(private val view: View, listener: onItemClickListener) : RecyclerView.ViewHolder(view) {
         val item_id: TextView = view.findViewById(R.id.item_id)
         val item_name: TextView = view.findViewById(R.id.item_name)
         val item_image: ImageView = view.findViewById(R.id.item_image)
+
+        init {
+            itemView.setOnClickListener {
+                listener.onItemClick(adapterPosition)
+            }
+        }
     }
 
     /**
@@ -34,7 +52,7 @@ class ItemAdapter(
         val adapterLayout = LayoutInflater.from(parent.context)
             .inflate(R.layout.list_item, parent, false)
 
-        return ItemViewHolder(adapterLayout)
+        return ItemViewHolder(adapterLayout, mListener)
     }
 
     /**
