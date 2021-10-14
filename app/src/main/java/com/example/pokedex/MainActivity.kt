@@ -37,14 +37,14 @@ class MainActivity : AppCompatActivity() {
                 //Toast.makeText(this@MainActivity, "You clicked on $position", Toast.LENGTH_SHORT).show()
 
                 val intent = Intent(this@MainActivity, PokemonActivity::class.java)
-                intent.putExtra("name", itemAdapter.dataset[position].name)
-                intent.putExtra("id", itemAdapter.dataset[position].id)
-                intent.putExtra("hp", itemAdapter.dataset[position].stats[5].baseStat)
-                intent.putExtra("atk", itemAdapter.dataset[position].stats[4].baseStat)
-                intent.putExtra("def", itemAdapter.dataset[position].stats[3].baseStat)
-                intent.putExtra("spatk", itemAdapter.dataset[position].stats[2].baseStat)
-                intent.putExtra("spdef", itemAdapter.dataset[position].stats[1].baseStat)
-                intent.putExtra("speed", itemAdapter.dataset[position].stats[0].baseStat)
+                intent.putExtra("name", itemAdapter.datasetFiltered[position].name)
+                intent.putExtra("id", itemAdapter.datasetFiltered[position].id)
+                intent.putExtra("hp", itemAdapter.datasetFiltered[position].stats[5].baseStat)
+                intent.putExtra("atk", itemAdapter.datasetFiltered[position].stats[4].baseStat)
+                intent.putExtra("def", itemAdapter.datasetFiltered[position].stats[3].baseStat)
+                intent.putExtra("spatk", itemAdapter.datasetFiltered[position].stats[2].baseStat)
+                intent.putExtra("spdef", itemAdapter.datasetFiltered[position].stats[1].baseStat)
+                intent.putExtra("speed", itemAdapter.datasetFiltered[position].stats[0].baseStat)
                 startActivity(intent)
             }
 
