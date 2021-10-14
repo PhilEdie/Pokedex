@@ -55,6 +55,7 @@ class ItemAdapter(
             .inflate(R.layout.list_item, parent, false)
 
         return ItemViewHolder(adapterLayout, mListener)
+
     }
 
     /**
