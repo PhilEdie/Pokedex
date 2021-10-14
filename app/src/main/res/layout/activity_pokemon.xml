@@ -34,8 +34,33 @@
         android:layout_gravity="bottom"
         android:padding="16dp"
         android:textAppearance="?attr/textAppearanceHeadline6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pokemon_id" />
+        app:layout_constraintStart_toEndOf="@+id/pokemon_id"
+        app:layout_constraintTop_toBottomOf="@+id/pokemon_image" />
+
+    <TextView
+        android:id="@+id/pokemon_type1"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        app:layout_constraintEnd_toStartOf="@+id/pokemon_type2"
+        app:layout_constraintTop_toBottomOf="@+id/pokemon_image"
+        android:background="@drawable/pokemon_type"/>
+
+    <TextView
+        android:id="@+id/pokemon_type2"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pokemon_image"
+        android:background="@drawable/pokemon_type"/>
+
+
 
     <com.github.mikephil.charting.charts.HorizontalBarChart
         android:id="@+id/pokemon_stats"

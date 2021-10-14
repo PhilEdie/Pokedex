@@ -1,13 +1,16 @@
 package com.example.pokedex
 
 import android.content.ContentValues.TAG
+import android.graphics.Color
 import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.view.menu.MenuView
+import androidx.core.content.ContextCompat
 import com.example.pokedex.data.Pokemon
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.HorizontalBarChart
@@ -21,6 +24,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_pokemon.*
+import org.w3c.dom.Text
 
 class PokemonActivity : AppCompatActivity() {
 
@@ -31,14 +35,36 @@ class PokemonActivity : AppCompatActivity() {
 
         val item_id : TextView = findViewById(R.id.pokemon_id)
         val item_name : TextView = findViewById(R.id.pokemon_name)
+        val item_type1 : TextView = findViewById(R.id.pokemon_type1)
+        val item_type2 : TextView = findViewById(R.id.pokemon_type2)
 
 
         val bundle : Bundle?= intent.extras
         val id = bundle!!.getInt("id")
         val name = bundle!!.getString("name")
+        val type1 = bundle!!.getString("type1")
+        var type2 : String = ""
+        if(bundle.getString("type2").isNullOrEmpty()){
+            item_type2.visibility = View.GONE
+        } else {
+            type2 = bundle!!.getString("type2").toString()
+
+        }
+
 
         item_id.text = "#" + id.toString()
         item_name.text = name.toString().replaceFirstChar { it.uppercase() }
+        item_type1.text = type1
+        item_type2.text = type2
+
+        if (type1 != null) {
+            setTypeBackgroundColor(item_type1, type1)
+        }
+
+        if (type2 != null) {
+            setTypeBackgroundColor(item_type2, type2)
+        }
+
 
         loadImage(id)
 
@@ -101,6 +127,29 @@ class PokemonActivity : AppCompatActivity() {
 
         stats.animateY(500)
         stats.invalidate()
+    }
+
+    private fun setTypeBackgroundColor(type : TextView, typeString : String){
+        when(typeString) {
+            "normal" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.normal))
+            "fire" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.fire))
+            "water" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.water))
+            "electric" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.electric))
+            "grass" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.grass))
+            "ice" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.ice))
+            "fighting" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.fighting))
+            "poison" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.poison))
+            "ground" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.ground))
+            "flying" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.flying))
+            "psychic" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.psychic))
+            "bug" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.bug))
+            "rock" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.rock))
+            "ghost" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.ghost))
+            "dragon" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.dragon))
+            "dark" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.dark))
+            "steel" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.steel))
+            "fairy" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.fairy))
+        }
     }
 
 }

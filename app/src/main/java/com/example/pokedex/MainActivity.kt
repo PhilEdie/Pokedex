@@ -34,11 +34,17 @@ class MainActivity : AppCompatActivity() {
         recycler_view.layoutManager = LinearLayoutManager(this)
         itemAdapter.setOnItemClickListener(object : ItemAdapter.onItemClickListener{
             override fun onItemClick(position: Int) {
-                //Toast.makeText(this@MainActivity, "You clicked on $position", Toast.LENGTH_SHORT).show()
 
                 val intent = Intent(this@MainActivity, PokemonActivity::class.java)
                 intent.putExtra("name", itemAdapter.datasetFiltered[position].name)
                 intent.putExtra("id", itemAdapter.datasetFiltered[position].id)
+                intent.putExtra("type1", itemAdapter.datasetFiltered[position].types[0].type.name)
+                if(itemAdapter.datasetFiltered[position].types.size == 2) {
+                    intent.putExtra(
+                        "type2",
+                        itemAdapter.datasetFiltered[position].types[1].type.name
+                    )
+                }
                 intent.putExtra("hp", itemAdapter.datasetFiltered[position].stats[5].baseStat)
                 intent.putExtra("atk", itemAdapter.datasetFiltered[position].stats[4].baseStat)
                 intent.putExtra("def", itemAdapter.datasetFiltered[position].stats[3].baseStat)
@@ -52,7 +58,6 @@ class MainActivity : AppCompatActivity() {
 
         getPokemonData()
         recycler_view.adapter = itemAdapter
-
     }
 
     fun getPokemonData(){
@@ -74,7 +79,9 @@ class MainActivity : AppCompatActivity() {
                     print("inside onResponse, toReturn = " + pokemon.name)
                     this@MainActivity.runOnUiThread(java.lang.Runnable {
                         itemAdapter.addPokemon(pokemon)
+                        itemAdapter.dataset.sortBy { it.id }
                         itemAdapter.datasetFiltered.add(pokemon)
+                        itemAdapter.datasetFiltered.sortBy { it.id }
                     })
 
                 }
@@ -83,6 +90,7 @@ class MainActivity : AppCompatActivity() {
                     e.printStackTrace()
                 }
             })
+
         }
     }
 
@@ -94,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Toast.makeText(this@MainActivity, "onQueryTextSubmit", Toast.LENGTH_SHORT).show();
+
                 return false
             }
 
@@ -104,16 +112,15 @@ class MainActivity : AppCompatActivity() {
                 val searchText = newText!!.lowercase(Locale.getDefault())
                 if(searchText.isNotEmpty()){
                     itemAdapter.dataset.forEach{
-                        if(it.name.contains(searchText) || it.id.toString().contains(searchText)){
+                        if(it.name.contains(searchText) || it.id.toString().contentEquals(searchText)){
                             itemAdapter.datasetFiltered.add(it)
-                            Toast.makeText(this@MainActivity, "added", Toast.LENGTH_SHORT).show();
                         }
                     }
-                    itemAdapter.notifyDataSetChanged()
+                    itemAdapter!!.notifyDataSetChanged()
                 } else {
                     itemAdapter.datasetFiltered.clear()
                     itemAdapter.datasetFiltered.addAll(itemAdapter.dataset)
-                    itemAdapter.notifyDataSetChanged()
+                    itemAdapter!!.notifyDataSetChanged()
                 }
 
                 return false
