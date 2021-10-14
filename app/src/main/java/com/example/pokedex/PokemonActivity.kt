@@ -15,7 +15,9 @@ import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_pokemon.*
@@ -29,7 +31,7 @@ class PokemonActivity : AppCompatActivity() {
 
         val item_id : TextView = findViewById(R.id.pokemon_id)
         val item_name : TextView = findViewById(R.id.pokemon_name)
-        val item_image : ImageView = findViewById(R.id.pokemon_image)
+
 
         val bundle : Bundle?= intent.extras
         val id = bundle!!.getInt("id")
@@ -38,26 +40,19 @@ class PokemonActivity : AppCompatActivity() {
         item_id.text = "#" + id.toString()
         item_name.text = name.toString().replaceFirstChar { it.uppercase() }
 
-        var imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/" + id + ".png"
-        if(id.toString().length == 1){
-            imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/00" + id + ".png"
-        } else if(id.toString().length == 2){
-            imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/0" + id + ".png"
-        }
-
-        Picasso.get().load(imageUri).placeholder(R.drawable.pokeball).into(item_image)
+        loadImage(id)
 
         var stats : HorizontalBarChart = findViewById(R.id.pokemon_stats)
 
         var barWidth : Float = 9f
         var spacing : Float = 10f
 
-        var hp : Float = 100f
-        var atk : Float = 80f
-        var def : Float = 120f
-        var spatk : Float = 30f
-        var spdef : Float = 60f
-        var speed : Float = 30f
+        var hp = bundle!!.getInt("hp").toFloat()
+        var atk = bundle!!.getInt("atk").toFloat()
+        var def = bundle!!.getInt("def").toFloat()
+        var spatk = bundle!!.getInt("spatk").toFloat()
+        var spdef = bundle!!.getInt("spdef").toFloat()
+        var speed = bundle!!.getInt("speed").toFloat()
 
         val entries: ArrayList<BarEntry> = ArrayList()
         entries.add(BarEntry(1f, hp))
@@ -76,16 +71,34 @@ class PokemonActivity : AppCompatActivity() {
         initialiseStatsChart()
     }
 
+    private fun loadImage(id : Int){
+        val item_image : ImageView = findViewById(R.id.pokemon_image)
+        var imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/" + id + ".png"
+        if(id.toString().length == 1){
+            imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/00" + id + ".png"
+        } else if(id.toString().length == 2){
+            imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/0" + id + ".png"
+        }
+
+        Picasso.get().load(imageUri).placeholder(R.drawable.pokeball).into(item_image)
+
+    }
+
     private fun initialiseStatsChart(){
         var stats : HorizontalBarChart = findViewById(R.id.pokemon_stats)
         stats.axisLeft.setDrawGridLines(false)
         stats.xAxis.setDrawGridLines(false)
         stats.xAxis.setDrawAxisLine(false)
-
         stats.axisRight.isEnabled = false
         stats.legend.isEnabled = false
-
         stats.description.isEnabled = false
+        stats.axisLeft.axisMaximum = 255f
+        stats.axisLeft.axisMinimum = 0f
+
+        val xAxisLabels = listOf(".", "Speed", "Sp.Def", "Sp.Atk", "Defense", "Attack", "HP")
+        stats.xAxis.valueFormatter = IndexAxisValueFormatter(xAxisLabels)
+
+
         stats.animateY(500)
         stats.invalidate()
     }

@@ -3,7 +3,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +18,7 @@ import kotlinx.android.synthetic.main.list_item.view.*
 import okhttp3.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,13 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize data.
         itemAdapter = ItemAdapter(mutableListOf<Pokemon>())
-        //val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
 
-        // Use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        //recyclerView.setHasFixedSize(true)
-
-        recycler_view.adapter = itemAdapter
         recycler_view.layoutManager = LinearLayoutManager(this)
         itemAdapter.setOnItemClickListener(object : ItemAdapter.onItemClickListener{
             override fun onItemClick(position: Int) {
@@ -42,13 +39,25 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(this@MainActivity, PokemonActivity::class.java)
                 intent.putExtra("name", itemAdapter.dataset[position].name)
                 intent.putExtra("id", itemAdapter.dataset[position].id)
+                intent.putExtra("hp", itemAdapter.dataset[position].stats[5].baseStat)
+                intent.putExtra("atk", itemAdapter.dataset[position].stats[4].baseStat)
+                intent.putExtra("def", itemAdapter.dataset[position].stats[3].baseStat)
+                intent.putExtra("spatk", itemAdapter.dataset[position].stats[2].baseStat)
+                intent.putExtra("spdef", itemAdapter.dataset[position].stats[1].baseStat)
+                intent.putExtra("speed", itemAdapter.dataset[position].stats[0].baseStat)
                 startActivity(intent)
             }
 
         })
-        val client = OkHttpClient()
 
-        for(i in 1..151) {
+        getPokemonData()
+        recycler_view.adapter = itemAdapter
+
+    }
+
+    fun getPokemonData(){
+        val client = OkHttpClient()
+        for(i in 1..800) {
 
             var url = "https://pokeapi.co/api/v2/pokemon/" + i
             val request = Request.Builder()
@@ -65,6 +74,7 @@ class MainActivity : AppCompatActivity() {
                     print("inside onResponse, toReturn = " + pokemon.name)
                     this@MainActivity.runOnUiThread(java.lang.Runnable {
                         itemAdapter.addPokemon(pokemon)
+                        itemAdapter.datasetFiltered.add(pokemon)
                     })
 
                 }
@@ -74,6 +84,43 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+        menuInflater.inflate(R.menu.menu_item,menu)
+        val item = menu?.findItem(R.id.search_action)
+        val searchView = item?.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                Toast.makeText(this@MainActivity, "onQueryTextSubmit", Toast.LENGTH_SHORT).show();
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+
+                itemAdapter.datasetFiltered.clear()
+                val searchText = newText!!.lowercase(Locale.getDefault())
+                if(searchText.isNotEmpty()){
+                    itemAdapter.dataset.forEach{
+                        if(it.name.contains(searchText) || it.id.toString().contains(searchText)){
+                            itemAdapter.datasetFiltered.add(it)
+                            Toast.makeText(this@MainActivity, "added", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    itemAdapter.notifyDataSetChanged()
+                } else {
+                    itemAdapter.datasetFiltered.clear()
+                    itemAdapter.datasetFiltered.addAll(itemAdapter.dataset)
+                    itemAdapter.notifyDataSetChanged()
+                }
+
+                return false
+            }
+
+        })
+        return super.onCreateOptionsMenu(menu)
     }
 }
 

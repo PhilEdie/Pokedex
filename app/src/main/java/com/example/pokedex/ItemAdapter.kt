@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.core.view.drawToBitmap
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.data.Pokemon
+import com.github.mikephil.charting.data.BarEntry
 import com.squareup.picasso.Picasso
 
 
@@ -16,7 +17,10 @@ import com.squareup.picasso.Picasso
  */
 class ItemAdapter(
     val dataset: MutableList<Pokemon>
+
 ) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
+
+    val datasetFiltered: ArrayList<Pokemon> = ArrayList()
 
 
     //Setting up the OnClickListener:
@@ -62,7 +66,7 @@ class ItemAdapter(
      * Replace the contents of a view (invoked by the layout manager)
      */
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        val item = dataset[position]
+        val item = datasetFiltered[position]
         holder.item_id.text = "#" + item.id.toString()
         holder.item_name.text = item.name.replaceFirstChar { it.uppercase() }
         var imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/" + item.id + ".png"
@@ -78,7 +82,7 @@ class ItemAdapter(
     /**
      * Return the size of your dataset (invoked by the layout manager)
      */
-    override fun getItemCount() = dataset.size
+    override fun getItemCount() = datasetFiltered.size
 
     fun addPokemon(pokemon: Pokemon){
         dataset.add(pokemon)
