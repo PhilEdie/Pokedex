@@ -1,9 +1,11 @@
 package com.example.pokedex
+import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.drawToBitmap
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.data.Pokemon
 import com.squareup.picasso.Picasso
@@ -13,7 +15,7 @@ import com.squareup.picasso.Picasso
  * Adapter for the [RecyclerView] in [MainActivity]. Displays [Affirmation] data object.
  */
 class ItemAdapter(
-    private val dataset: MutableList<Pokemon>
+    val dataset: MutableList<Pokemon>
 ) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
 
@@ -69,8 +71,7 @@ class ItemAdapter(
             imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/0" + item.id + ".png"
         }
 
-        Picasso.get().load(imageUri).into(holder.item_image)
-
+        Picasso.get().load(imageUri).placeholder(R.drawable.pokeball).into(holder.item_image)
     }
 
     /**

@@ -35,8 +35,7 @@
             android:id="@+id/item_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="left
-"
+            android:layout_gravity="left"
             android:padding="16dp"
             android:textAppearance="?attr/textAppearanceHeadline6" />
     </LinearLayout>
