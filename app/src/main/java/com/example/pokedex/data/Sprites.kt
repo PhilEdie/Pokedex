@@ -2,6 +2,7 @@ package com.example.pokedex.data
 
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class Sprites(
     @SerializedName("back_default")
@@ -22,4 +23,4 @@ data class Sprites(
     val frontShinyFemale: Any,
     @SerializedName("other")
     val other: Other,
-)
+) : Serializable

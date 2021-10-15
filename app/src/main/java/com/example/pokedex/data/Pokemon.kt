@@ -2,8 +2,11 @@ package com.example.pokedex.data
 
 
 import android.graphics.Bitmap
+import android.os.Parcelable
 import android.widget.ImageView
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
+
 
 data class Pokemon(
     @SerializedName("abilities")
@@ -28,10 +31,12 @@ data class Pokemon(
     var species: Species,
     @SerializedName("sprites")
     val sprites: Sprites,
+    @SerializedName("other")
+    val other : Other,
     @SerializedName("stats")
     val stats: List<Stat>,
     @SerializedName("types")
     val types: List<Type>,
     @SerializedName("weight")
     val weight: Int,
-)
+) : Serializable

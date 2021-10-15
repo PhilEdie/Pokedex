@@ -2,6 +2,7 @@ package com.example.pokedex.data
 
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class Animated(
     @SerializedName("back_default")
@@ -20,4 +21,4 @@ data class Animated(
     val frontShiny: String,
     @SerializedName("front_shiny_female")
     val frontShinyFemale: Any
-)
+) : Serializable

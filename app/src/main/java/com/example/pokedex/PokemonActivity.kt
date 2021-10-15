@@ -1,6 +1,7 @@
 package com.example.pokedex
 
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.graphics.Color
 import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
@@ -33,52 +34,47 @@ class PokemonActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pokemon)
 
+        val bundle : Bundle?= intent.extras
+        var bundle_value : Pokemon = bundle!!.get("pokemon_extra") as Pokemon
+
+        var imageUri = bundle_value?.sprites?.other?.officialArtwork?.frontDefault
+
+        var resID = resources.getIdentifier("p" + bundle_value?.id.toString(), "drawable", packageName)
+        pokemon_image.setImageResource(resID)
+
         val item_id : TextView = findViewById(R.id.pokemon_id)
         val item_name : TextView = findViewById(R.id.pokemon_name)
         val item_type1 : TextView = findViewById(R.id.pokemon_type1)
         val item_type2 : TextView = findViewById(R.id.pokemon_type2)
 
+        item_id.text = "#" + bundle_value.id.toString()
+        item_name.text = bundle_value.name.replaceFirstChar { it.uppercase() }
+        item_type1.text = bundle_value.types[0].type.name
 
-        val bundle : Bundle?= intent.extras
-        val id = bundle!!.getInt("id")
-        val name = bundle!!.getString("name")
-        val type1 = bundle!!.getString("type1")
-        var type2 : String = ""
-        if(bundle.getString("type2").isNullOrEmpty()){
+        if(bundle_value.types.size == 1){
             item_type2.visibility = View.GONE
         } else {
-            type2 = bundle!!.getString("type2").toString()
-
+            item_type2.text = bundle_value.types[1].type.name
         }
 
+        setTypeBackgroundColor(item_type1, bundle_value.types[0].type.name)
 
-        item_id.text = "#" + id.toString()
-        item_name.text = name.toString().replaceFirstChar { it.uppercase() }
-        item_type1.text = type1
-        item_type2.text = type2
 
-        if (type1 != null) {
-            setTypeBackgroundColor(item_type1, type1)
+        if (bundle_value.types.size == 2) {
+            setTypeBackgroundColor(item_type2, bundle_value.types[1].type.name)
         }
-
-        if (type2 != null) {
-            setTypeBackgroundColor(item_type2, type2)
-        }
-
-
-        loadImage(id)
 
         var stats : HorizontalBarChart = findViewById(R.id.pokemon_stats)
 
         var barWidth : Float = 9f
         var spacing : Float = 10f
 
-        var hp = bundle!!.getInt("hp").toFloat()
-        var atk = bundle!!.getInt("atk").toFloat()
-        var def = bundle!!.getInt("def").toFloat()
-        var spatk = bundle!!.getInt("spatk").toFloat()
-        var spdef = bundle!!.getInt("spdef").toFloat()
-        var speed = bundle!!.getInt("speed").toFloat()
+        var hp = bundle_value.stats[5].baseStat.toFloat()
+        var atk = bundle_value.stats[4].baseStat.toFloat()
+        var def = bundle_value.stats[3].baseStat.toFloat()
+        var spatk = bundle_value.stats[2].baseStat.toFloat()
+        var spdef = bundle_value.stats[1].baseStat.toFloat()
+        var speed = bundle_value.stats[0].baseStat.toFloat()
 
         val entries: ArrayList<BarEntry> = ArrayList()
         entries.add(BarEntry(1f, hp))
@@ -97,18 +93,6 @@ class PokemonActivity : AppCompatActivity() {
         initialiseStatsChart()
     }
 
-    private fun loadImage(id : Int){
-        val item_image : ImageView = findViewById(R.id.pokemon_image)
-        var imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/" + id + ".png"
-        if(id.toString().length == 1){
-            imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/00" + id + ".png"
-        } else if(id.toString().length == 2){
-            imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/0" + id + ".png"
-        }
-
-        Picasso.get().load(imageUri).placeholder(R.drawable.pokeball).into(item_image)
-
-    }
 
     private fun initialiseStatsChart(){
         var stats : HorizontalBarChart = findViewById(R.id.pokemon_stats)

@@ -1,9 +1,13 @@
 package com.example.pokedex
+import android.content.Context
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.data.Pokemon
 import com.squareup.picasso.Picasso
@@ -11,13 +15,10 @@ import com.squareup.picasso.Picasso
 /**
  * Adapter for the [RecyclerView] in [MainActivity]. Displays [Affirmation] data object.
  */
-class ItemAdapter(
-    val dataset: MutableList<Pokemon>
+class ItemAdapter(val context : Context) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
-) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
-
-    val datasetFiltered: ArrayList<Pokemon> = ArrayList()
-
+    val dataset: HashMap<Int, Pokemon> = HashMap<Int, Pokemon>()
+    val datasetFiltered: HashMap<Int, Pokemon> = HashMap<Int, Pokemon>()
 
     //Setting up the OnClickListener:
     private lateinit var mListener : onItemClickListener
@@ -62,17 +63,14 @@ class ItemAdapter(
      * Replace the contents of a view (invoked by the layout manager)
      */
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        val item = datasetFiltered[position]
-        holder.item_id.text = "#" + item.id.toString()
-        holder.item_name.text = item.name.replaceFirstChar { it.uppercase() }
-        var imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/" + item.id + ".png"
-        if(item.id.toString().length == 1){
-            imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/00" + item.id + ".png"
-        } else if(item.id.toString().length == 2){
-            imageUri = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/0" + item.id + ".png"
-        }
 
-        Picasso.get().load(imageUri).placeholder(R.drawable.pokeball).into(holder.item_image)
+        val item = datasetFiltered[position + 1]        //May need to add 1.
+        holder.item_id.text = "#" + item?.id.toString()
+        holder.item_name.text = item?.name?.replaceFirstChar { it.uppercase() }
+
+        var resID = context.resources.getIdentifier("p" + item?.id.toString(), "drawable", context.packageName)
+        holder.item_image.setImageResource(resID)
+
     }
 
     /**
@@ -81,7 +79,7 @@ class ItemAdapter(
     override fun getItemCount() = datasetFiltered.size
 
     fun addPokemon(pokemon: Pokemon){
-        dataset.add(pokemon)
+        dataset[pokemon.id] = pokemon
         notifyItemInserted(dataset.size-1)
     }
 }

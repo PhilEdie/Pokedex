@@ -1,6 +1,7 @@
 package com.example.pokedex
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -35,28 +36,14 @@ class MainActivity : AppCompatActivity() {
 
 
         // Initialize data.
-        itemAdapter = ItemAdapter(mutableListOf<Pokemon>())
+        itemAdapter = ItemAdapter(this@MainActivity)
 
         recycler_view.layoutManager = LinearLayoutManager(this)
         itemAdapter.setOnItemClickListener(object : ItemAdapter.onItemClickListener{
             override fun onItemClick(position: Int) {
 
                 val intent = Intent(this@MainActivity, PokemonActivity::class.java)
-                intent.putExtra("name", itemAdapter.datasetFiltered[position].name)
-                intent.putExtra("id", itemAdapter.datasetFiltered[position].id)
-                intent.putExtra("type1", itemAdapter.datasetFiltered[position].types[0].type.name)
-                if(itemAdapter.datasetFiltered[position].types.size == 2) {
-                    intent.putExtra(
-                        "type2",
-                        itemAdapter.datasetFiltered[position].types[1].type.name
-                    )
-                }
-                intent.putExtra("hp", itemAdapter.datasetFiltered[position].stats[5].baseStat)
-                intent.putExtra("atk", itemAdapter.datasetFiltered[position].stats[4].baseStat)
-                intent.putExtra("def", itemAdapter.datasetFiltered[position].stats[3].baseStat)
-                intent.putExtra("spatk", itemAdapter.datasetFiltered[position].stats[2].baseStat)
-                intent.putExtra("spdef", itemAdapter.datasetFiltered[position].stats[1].baseStat)
-                intent.putExtra("speed", itemAdapter.datasetFiltered[position].stats[0].baseStat)
+                intent.putExtra("pokemon_extra", itemAdapter.datasetFiltered[position + 1])
                 startActivity(intent)
             }
 
@@ -89,9 +76,7 @@ class MainActivity : AppCompatActivity() {
                 print("inside onResponse, toReturn = " + pokemon.name)
                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                     itemAdapter.addPokemon(pokemon)
-                    itemAdapter.dataset.sortBy { it.id }
-                    itemAdapter.datasetFiltered.add(pokemon)
-                    itemAdapter.datasetFiltered.sortBy { it.id }
+                    itemAdapter.datasetFiltered[pokemon.id] = pokemon
                     createSpecies(client, id)
                 })
 
@@ -116,9 +101,7 @@ class MainActivity : AppCompatActivity() {
                 val gson = GsonBuilder().create()
                 var species : SpeciesData = gson.fromJson(body, SpeciesData::class.java)
                 this@MainActivity.runOnUiThread(java.lang.Runnable {
-                    itemAdapter.dataset[id].species.speciesData = species
-                    Log.d("DEBUGGER", "Pokemon = " + itemAdapter.dataset[id].name +
-                    ", Species = " + species.name)
+                    itemAdapter.dataset[id]?.species?.speciesData  = species
                 })
 
             }
@@ -147,14 +130,14 @@ class MainActivity : AppCompatActivity() {
                 val searchText = newText!!.lowercase(Locale.getDefault())
                 if(searchText.isNotEmpty()){
                     itemAdapter.dataset.forEach{
-                        if(it.name.contains(searchText) || it.id.toString().contentEquals(searchText)){
-                            itemAdapter.datasetFiltered.add(it)
+                        if(it.value.name.contains(searchText) || it.key.toString().contentEquals(searchText)){
+                            itemAdapter.datasetFiltered.put(it.key, it.value)
                         }
                     }
                     itemAdapter!!.notifyDataSetChanged()
                 } else {
                     itemAdapter.datasetFiltered.clear()
-                    itemAdapter.datasetFiltered.addAll(itemAdapter.dataset)
+                    itemAdapter.datasetFiltered.putAll(itemAdapter.dataset)
                     itemAdapter!!.notifyDataSetChanged()
                 }
 
@@ -163,6 +146,13 @@ class MainActivity : AppCompatActivity() {
 
         })
         return super.onCreateOptionsMenu(menu)
+    }
+
+    fun Context.resIdByName(resIdName: String?, resType: String): Int {
+        resIdName?.let {
+            return resources.getIdentifier(it, resType, packageName)
+        }
+        throw Resources.NotFoundException()
     }
 
 }

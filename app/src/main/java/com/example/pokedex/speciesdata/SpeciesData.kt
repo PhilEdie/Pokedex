@@ -2,6 +2,7 @@ package com.example.pokedex.speciesdata
 
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class SpeciesData(
     @SerializedName("base_happiness")
@@ -56,4 +57,4 @@ data class SpeciesData(
     val shape: Shape,
     @SerializedName("varieties")
     val varieties: List<Variety>
-)
+) : Serializable
