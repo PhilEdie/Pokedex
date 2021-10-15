@@ -1,8 +1,10 @@
 package com.example.pokedex
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
@@ -11,6 +13,8 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.data.Pokemon
+import com.example.pokedex.data.Species
+import com.example.pokedex.speciesdata.SpeciesData
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.list_item.*
@@ -27,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
 
         // Initialize data.
         itemAdapter = ItemAdapter(mutableListOf<Pokemon>())
@@ -62,36 +68,65 @@ class MainActivity : AppCompatActivity() {
 
     fun getPokemonData(){
         val client = OkHttpClient()
-        for(i in 1..800) {
-
-            var url = "https://pokeapi.co/api/v2/pokemon/" + i
-            val request = Request.Builder()
-                .url(url)
-                .build()
-
-            client.newCall(request).enqueue(object : Callback {
-
-                override fun onResponse(call: Call, response: Response) {
-
-                    val body = response.body?.string()
-                    val gson = GsonBuilder().create()
-                    var pokemon = gson.fromJson(body, Pokemon::class.java)
-                    print("inside onResponse, toReturn = " + pokemon.name)
-                    this@MainActivity.runOnUiThread(java.lang.Runnable {
-                        itemAdapter.addPokemon(pokemon)
-                        itemAdapter.dataset.sortBy { it.id }
-                        itemAdapter.datasetFiltered.add(pokemon)
-                        itemAdapter.datasetFiltered.sortBy { it.id }
-                    })
-
-                }
-
-                override fun onFailure(call: Call, e: IOException) {
-                    e.printStackTrace()
-                }
-            })
-
+        for(id in 1..800) {
+            createPokemon(client, id)
         }
+    }
+
+    fun createPokemon(client: OkHttpClient, id : Int){
+        var pokemonUrl = "https://pokeapi.co/api/v2/pokemon/" + id
+        var pokemonRequest = Request.Builder()
+            .url(pokemonUrl)
+            .build()
+
+        client.newCall(pokemonRequest).enqueue(object : Callback {
+
+            override fun onResponse(call: Call, response: Response) {
+
+                val body = response.body?.string()
+                val gson = GsonBuilder().create()
+                var pokemon = gson.fromJson(body, Pokemon::class.java)
+                print("inside onResponse, toReturn = " + pokemon.name)
+                this@MainActivity.runOnUiThread(java.lang.Runnable {
+                    itemAdapter.addPokemon(pokemon)
+                    itemAdapter.dataset.sortBy { it.id }
+                    itemAdapter.datasetFiltered.add(pokemon)
+                    itemAdapter.datasetFiltered.sortBy { it.id }
+                    createSpecies(client, id)
+                })
+
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+        })
+    }
+
+    fun createSpecies(client: OkHttpClient, id : Int){
+        var speciesUrl = "https://pokeapi.co/api/v2/pokemon-species/" + id
+        var speciesRequest = Request.Builder()
+            .url(speciesUrl)
+            .build()
+
+        client.newCall(speciesRequest).enqueue(object : Callback {
+
+            override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string()
+                val gson = GsonBuilder().create()
+                var species : SpeciesData = gson.fromJson(body, SpeciesData::class.java)
+                this@MainActivity.runOnUiThread(java.lang.Runnable {
+                    itemAdapter.dataset[id].species.speciesData = species
+                    Log.d("DEBUGGER", "Pokemon = " + itemAdapter.dataset[id].name +
+                    ", Species = " + species.name)
+                })
+
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -129,5 +164,6 @@ class MainActivity : AppCompatActivity() {
         })
         return super.onCreateOptionsMenu(menu)
     }
+
 }
 

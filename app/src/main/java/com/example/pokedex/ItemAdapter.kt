@@ -1,16 +1,12 @@
 package com.example.pokedex
-import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.drawToBitmap
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.data.Pokemon
-import com.github.mikephil.charting.data.BarEntry
 import com.squareup.picasso.Picasso
-
 
 /**
  * Adapter for the [RecyclerView] in [MainActivity]. Displays [Affirmation] data object.

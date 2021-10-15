@@ -1,9 +1,9 @@
-package com.example.pokedex.data
+package com.example.pokedex.speciesdata
 
 
 import com.google.gson.annotations.SerializedName
 
-data class VersionGroup(
+data class Habitat(
     @SerializedName("name")
     val name: String,
     @SerializedName("url")

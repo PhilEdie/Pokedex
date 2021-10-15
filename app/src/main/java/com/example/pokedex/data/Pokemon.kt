@@ -10,10 +10,6 @@ data class Pokemon(
     val abilities: List<Ability>,
     @SerializedName("base_experience")
     val baseExperience: Int,
-    @SerializedName("forms")
-    val forms: List<Form>,
-    @SerializedName("game_indices")
-    val gameIndices: List<GameIndice>,
     @SerializedName("height")
     val height: Int,
     @SerializedName("held_items")
@@ -28,12 +24,8 @@ data class Pokemon(
     val moves: List<Move>,
     @SerializedName("name")
     val name: String,
-    @SerializedName("order")
-    val order: Int,
-    @SerializedName("past_types")
-    val pastTypes: List<Any>,
     @SerializedName("species")
-    val species: Species,
+    var species: Species,
     @SerializedName("sprites")
     val sprites: Sprites,
     @SerializedName("stats")
@@ -42,6 +34,4 @@ data class Pokemon(
     val types: List<Type>,
     @SerializedName("weight")
     val weight: Int,
-    @SerializedName("image")
-    var image: Bitmap
 )
