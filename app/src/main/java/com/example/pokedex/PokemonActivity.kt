@@ -42,14 +42,19 @@ class PokemonActivity : AppCompatActivity() {
         var resID = resources.getIdentifier("p" + bundle_value?.id.toString(), "drawable", packageName)
         pokemon_image.setImageResource(resID)
 
-        val item_id : TextView = findViewById(R.id.pokemon_id)
-        val item_name : TextView = findViewById(R.id.pokemon_name)
+        val item_id_name : TextView = findViewById(R.id.pokemon_id_name)
         val item_type1 : TextView = findViewById(R.id.pokemon_type1)
         val item_type2 : TextView = findViewById(R.id.pokemon_type2)
+        val species : TextView = findViewById(R.id.pokemon_species)
+        val flavor_text : TextView = findViewById(R.id.pokemon_flavortext)
 
-        item_id.text = "#" + bundle_value.id.toString()
-        item_name.text = bundle_value.name.replaceFirstChar { it.uppercase() }
+        item_id_name.text = "#" + bundle_value.id.toString() + " " + bundle_value.name.replaceFirstChar { it.uppercase() }
         item_type1.text = bundle_value.types[0].type.name
+        if(bundle_value.species.speciesData != null){
+            species.text = bundle_value.species.speciesData.genera[7].genus
+            flavor_text.text = bundle_value.species.speciesData.flavorTextEntries[0].flavorText.replace("\n", " ")
+        }
+
 
         if(bundle_value.types.size == 1){
             item_type2.visibility = View.GONE

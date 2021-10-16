@@ -1,4 +1,5 @@
 package com.example.pokedex
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -7,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.graphics.drawable.toBitmap
@@ -43,8 +45,17 @@ class MainActivity : AppCompatActivity() {
             override fun onItemClick(position: Int) {
 
                 val intent = Intent(this@MainActivity, PokemonActivity::class.java)
-                intent.putExtra("pokemon_extra", itemAdapter.datasetFiltered[position + 1])
+                intent.putExtra("pokemon_extra", itemAdapter.datasetFiltered.toList()[position].second)
+
+                //Hiding the keyboard when entering next activity.
+                var imm : InputMethodManager = this@MainActivity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                var view = this@MainActivity.currentFocus
+                if (view != null) {
+                    imm.hideSoftInputFromWindow(view.windowToken, 0)
+                }
+
                 startActivity(intent)
+
             }
 
         })
@@ -53,14 +64,14 @@ class MainActivity : AppCompatActivity() {
         recycler_view.adapter = itemAdapter
     }
 
-    fun getPokemonData(){
+    private fun getPokemonData(){
         val client = OkHttpClient()
         for(id in 1..800) {
             createPokemon(client, id)
         }
     }
 
-    fun createPokemon(client: OkHttpClient, id : Int){
+    private fun createPokemon(client: OkHttpClient, id : Int){
         var pokemonUrl = "https://pokeapi.co/api/v2/pokemon/" + id
         var pokemonRequest = Request.Builder()
             .url(pokemonUrl)
@@ -76,7 +87,7 @@ class MainActivity : AppCompatActivity() {
                 print("inside onResponse, toReturn = " + pokemon.name)
                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                     itemAdapter.addPokemon(pokemon)
-                    itemAdapter.datasetFiltered[pokemon.id] = pokemon
+                    //itemAdapter.datasetFiltered[pokemon.id] = pokemon
                     createSpecies(client, id)
                 })
 
@@ -120,7 +131,6 @@ class MainActivity : AppCompatActivity() {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
-
                 return false
             }
 
@@ -131,14 +141,16 @@ class MainActivity : AppCompatActivity() {
                 if(searchText.isNotEmpty()){
                     itemAdapter.dataset.forEach{
                         if(it.value.name.contains(searchText) || it.key.toString().contentEquals(searchText)){
-                            itemAdapter.datasetFiltered.put(it.key, it.value)
+                            Log.d("DEBUGGER", "Matching key: " + it.key.toString() + ", value = " + it.value.name)
+                            itemAdapter.datasetFiltered[it.key] = it.value
+
                         }
                     }
                     itemAdapter!!.notifyDataSetChanged()
                 } else {
                     itemAdapter.datasetFiltered.clear()
                     itemAdapter.datasetFiltered.putAll(itemAdapter.dataset)
-                    itemAdapter!!.notifyDataSetChanged()
+                    itemAdapter.notifyDataSetChanged()
                 }
 
                 return false
@@ -146,13 +158,6 @@ class MainActivity : AppCompatActivity() {
 
         })
         return super.onCreateOptionsMenu(menu)
-    }
-
-    fun Context.resIdByName(resIdName: String?, resType: String): Int {
-        resIdName?.let {
-            return resources.getIdentifier(it, resType, packageName)
-        }
-        throw Resources.NotFoundException()
     }
 
 }

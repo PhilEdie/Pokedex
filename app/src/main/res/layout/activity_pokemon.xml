@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/pokemon_id"
+        android:id="@+id/pokemon_id_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -28,14 +28,24 @@
         app:layout_constraintTop_toBottomOf="@+id/pokemon_image" />
 
     <TextView
-        android:id="@+id/pokemon_name"
+        android:id="@+id/pokemon_species"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:padding="16dp"
         android:textAppearance="?attr/textAppearanceHeadline6"
-        app:layout_constraintStart_toEndOf="@+id/pokemon_id"
-        app:layout_constraintTop_toBottomOf="@+id/pokemon_image" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pokemon_type1" />
+
+    <TextView
+        android:id="@+id/pokemon_flavortext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:padding="16dp"
+        android:textAppearance="?android:textAppearanceSmall"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pokemon_species" />
 
     <TextView
         android:id="@+id/pokemon_type1"
@@ -45,8 +55,7 @@
         android:padding="16dp"
         android:textAppearance="?attr/textAppearanceHeadline6"
         app:layout_constraintEnd_toStartOf="@+id/pokemon_type2"
-        app:layout_constraintTop_toBottomOf="@+id/pokemon_image"
-        android:background="@drawable/pokemon_type"/>
+        app:layout_constraintTop_toBottomOf="@+id/pokemon_image"/>
 
     <TextView
         android:id="@+id/pokemon_type2"
@@ -57,9 +66,7 @@
         android:textAppearance="?attr/textAppearanceHeadline6"
 
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pokemon_image"
-        android:background="@drawable/pokemon_type"/>
-
+        app:layout_constraintTop_toBottomOf="@+id/pokemon_image"/>
 
 
     <com.github.mikephil.charting.charts.HorizontalBarChart
@@ -68,7 +75,7 @@
         android:layout_height="200dp"
         android:layout_gravity="bottom"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pokemon_name" />
+        app:layout_constraintTop_toBottomOf="@+id/pokemon_flavortext" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
