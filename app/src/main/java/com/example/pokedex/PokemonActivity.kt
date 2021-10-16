@@ -60,8 +60,16 @@ class PokemonActivity : AppCompatActivity() {
         itemIdName.text = ("#" + pokemon.id.toString() + " " + pokemon.name.replaceFirstChar { it.uppercase() })
         itemType1.text = pokemon.types[0].type.name
         species.text = pokemon.species.speciesData.genera[7].genus
-        flavorText.text = pokemon.species.speciesData.flavorTextEntries[0].flavorText.replace("\n", " ")
 
+
+        //Select an english flavortext.
+        val flavorTexts = pokemon.species.speciesData.flavorTextEntries
+        for (i in flavorTexts.indices) {
+            if(flavorTexts[i].language.name == "en"){
+                flavorText.text = flavorTexts[i].flavorText.replace("\n", " ")
+                break
+            }
+        }
 
         //If the Pokemon has only one type, hide the text-box for the second type.
         if(pokemon.types.size == 1){
@@ -70,11 +78,7 @@ class PokemonActivity : AppCompatActivity() {
             itemType2.text = pokemon.types[1].type.name
         }
 
-        //itemType2.setBackgroundColor(ContextCompat.getColor(this@PokemonActivity, type2ColorID))
-
-
         //Set the type's text-box color to the type's color.
-
         val type1Drawable : Drawable = itemType1.background
         val type1ColorID = ColorUtil.getColorIDByTypeString(pokemon.types[0].type.name)
         type1Drawable.mutate().setColorFilter(ContextCompat.getColor(this@PokemonActivity, type1ColorID), PorterDuff.Mode.SRC_IN)
