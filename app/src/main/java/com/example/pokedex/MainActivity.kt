@@ -1,34 +1,25 @@
 package com.example.pokedex
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
-import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.data.Pokemon
-import com.example.pokedex.data.Species
 import com.example.pokedex.speciesdata.SpeciesData
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.list_item.*
 import kotlinx.android.synthetic.main.list_item.view.*
 import okhttp3.*
-import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
+
 
     private lateinit var itemAdapter: ItemAdapter
     private lateinit var  searchView: SearchView
@@ -37,26 +28,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-
         // Initialize data.
         itemAdapter = ItemAdapter(this@MainActivity)
 
         recycler_view.layoutManager = LinearLayoutManager(this)
-        itemAdapter.setOnItemClickListener(object : ItemAdapter.onItemClickListener{
+        itemAdapter.setOnItemClickListener(object : ItemAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
 
                 val intent = Intent(this@MainActivity, PokemonActivity::class.java)
                 intent.putExtra("pokemon_extra", itemAdapter.datasetFiltered.toList()[position].second)
 
                 //Hiding the keyboard when entering next activity.
-                var imm : InputMethodManager = this@MainActivity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                var view = this@MainActivity.currentFocus
+                val imm : InputMethodManager = this@MainActivity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                val view = this@MainActivity.currentFocus
                 if (view != null) {
                     imm.hideSoftInputFromWindow(view.windowToken, 0)
                 }
 
+                //Open the selected Pokemon's summary page.
                 startActivity(intent)
+
+                //Deselect the search bar.
                 searchView.clearFocus()
             }
         })
@@ -65,32 +57,36 @@ class MainActivity : AppCompatActivity() {
         recycler_view.adapter = itemAdapter
     }
 
+
+    /**
+     * Loops through all 898 Pokemon id's, calls [createPokemon] to create [Pokemon] objects.
+     */
     private fun getPokemonData(){
         val client = OkHttpClient()
-        for(id in 1..800) {
+        for(id in 1..898) {
             createPokemon(client, id)
         }
     }
 
+    /**
+     * Parses [Pokemon] object from PokeAPI. Adds the [Pokemon] object to the dataset.
+     */
     private fun createPokemon(client: OkHttpClient, id : Int){
-        var pokemonUrl = "https://pokeapi.co/api/v2/pokemon/" + id
-        var pokemonRequest = Request.Builder()
+        val pokemonUrl = "https://pokeapi.co/api/v2/pokemon/$id"
+        val pokemonRequest = Request.Builder()
             .url(pokemonUrl)
             .build()
 
         client.newCall(pokemonRequest).enqueue(object : Callback {
 
             override fun onResponse(call: Call, response: Response) {
-
                 val body = response.body?.string()
                 val gson = GsonBuilder().create()
-                var pokemon = gson.fromJson(body, Pokemon::class.java)
-                print("inside onResponse, toReturn = " + pokemon.name)
+                val pokemon = gson.fromJson(body, Pokemon::class.java)
                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                     itemAdapter.addPokemon(pokemon)
                     createSpecies(client, id)
                 })
-
             }
 
             override fun onFailure(call: Call, e: IOException) {
@@ -99,56 +95,62 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    /**
+     * Parses [SpeciesData] object from PokeAPI. adds [SpeciesData] to [Pokemon] object with the given id.
+     */
     fun createSpecies(client: OkHttpClient, id : Int){
         thread(start = true) {
-            var speciesUrl = "https://pokeapi.co/api/v2/pokemon-species/" + id
-            var speciesRequest = Request.Builder()
+            val speciesUrl = "https://pokeapi.co/api/v2/pokemon-species/$id"
+            val speciesRequest = Request.Builder()
                 .url(speciesUrl)
                 .build()
 
             client.newCall(speciesRequest).execute().use { response ->
                 val body = response.body?.string()
                 val gson = GsonBuilder().create()
-                var species: SpeciesData = gson.fromJson(body, SpeciesData::class.java)
+                val species: SpeciesData = gson.fromJson(body, SpeciesData::class.java)
                 itemAdapter.dataset[id]?.species?.speciesData = species
             }
         }
     }
 
+    /**
+     * Adds a search bar to the options menu.
+     */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
         menuInflater.inflate(R.menu.menu_item,menu)
         val item = menu?.findItem(R.id.search_action)
-        searchView = item?.actionView as SearchView
 
+        //Initialise searchView field.
+        searchView = item?.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
-
             override fun onQueryTextChange(newText: String?): Boolean {
-
+                //Reset the filter.
                 itemAdapter.datasetFiltered.clear()
+                //Make the search case insensitive.
                 val searchText = newText!!.lowercase(Locale.getDefault())
                 if(searchText.isNotEmpty()){
+                    //Select only Pokemon who's names contain the search string or who's id's match the search string.
                     itemAdapter.dataset.forEach{
                         if(it.value.name.contains(searchText) || it.key.toString().contentEquals(searchText)){
-                            Log.d("DEBUGGER", "Matching key: " + it.key.toString() + ", value = " + it.value.name)
                             itemAdapter.datasetFiltered[it.key] = it.value
-
                         }
                     }
                     itemAdapter!!.notifyDataSetChanged()
                 } else {
-                    itemAdapter.datasetFiltered.clear()
+                    //Add all Pokemon to the filter.
                     itemAdapter.datasetFiltered.putAll(itemAdapter.dataset)
                     itemAdapter.notifyDataSetChanged()
                 }
-
                 return false
             }
 
         })
+
         return super.onCreateOptionsMenu(menu)
     }
 

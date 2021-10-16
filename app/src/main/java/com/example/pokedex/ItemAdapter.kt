@@ -1,13 +1,11 @@
 package com.example.pokedex
 
 import android.content.Context
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.data.Pokemon
@@ -18,29 +16,32 @@ import com.example.pokedex.data.Pokemon
  */
 class ItemAdapter(val context: Context) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
+    /** The complete dataset containing all [Pokemon] objects.*/
     val dataset: HashMap<Int, Pokemon> = HashMap<Int, Pokemon>()
+
+    /** Tracks which Pokemon should be displayed. The filter changes depending on what's
+     * in the search bar.*/
     val datasetFiltered: HashMap<Int, Pokemon> = HashMap<Int, Pokemon>()
 
     //Setting up the OnClickListener:
-    private lateinit var mListener: onItemClickListener
+    private lateinit var mListener: OnItemClickListener
 
-    interface onItemClickListener {
+    interface OnItemClickListener {
         fun onItemClick(position: Int)
     }
 
-    fun setOnItemClickListener(listener: onItemClickListener) {
+    fun setOnItemClickListener(listener: OnItemClickListener) {
         mListener = listener
     }
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder.
-    // Each data item is just an com.example.pokedex.data.Affirmation object.
-    class ItemViewHolder(private val view: View, listener: onItemClickListener) :
+    /**
+     * Provides a reference to the views for each Pokemon item.
+     * Each item is just a [Pokemon] object.
+     */
+    class ItemViewHolder(private val view: View, listener: OnItemClickListener) :
         RecyclerView.ViewHolder(view) {
-        val item_id_name: TextView = view.findViewById(R.id.item_id_name)
-        val item_image: ImageView = view.findViewById(R.id.item_image)
-
+        val itemIdName: TextView = view.findViewById(R.id.item_id_name)
+        val itemImage: ImageView = view.findViewById(R.id.item_image)
 
         init {
             itemView.setOnClickListener {
@@ -66,21 +67,24 @@ class ItemAdapter(val context: Context) : RecyclerView.Adapter<ItemAdapter.ItemV
      */
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
 
-        val item = datasetFiltered.toList()[position].second  //May need to add 1.
+        //Get the Pokemon attached to the item.
+        val item = datasetFiltered.toList()[position].second
 
-        holder.item_id_name.text =
-            "#" + item?.id.toString() + " " + item?.name?.replaceFirstChar { it.uppercase() }
+        //assign the item text to be the Pokemon's ID and name.
+        holder.itemIdName.text = ("#" + item.id.toString() + " " +
+                item.name.replaceFirstChar { it.uppercase() })
 
-        //Setting the background color
-        var colorID = getColorIDByType(item?.types[0].type.name)
+        //Setting the background color of the item.
+        val colorID = getColorIDByType(item?.types[0].type.name)
         holder.itemView.setBackgroundColor(ContextCompat.getColor(context, colorID))
 
-        var resID = context.resources.getIdentifier(
+        //Assign the artwork for the item.
+        val resID = context.resources.getIdentifier(
             "p" + item?.id.toString(),
             "drawable",
             context.packageName
         )
-        holder.item_image.setImageResource(resID)
+        holder.itemImage.setImageResource(resID)
 
     }
 
@@ -89,12 +93,19 @@ class ItemAdapter(val context: Context) : RecyclerView.Adapter<ItemAdapter.ItemV
      */
     override fun getItemCount() = datasetFiltered.size
 
+    /**
+     * Loads new [Pokemon] objects into the dataset and the filter. Updates the UI
+     * by calling notifyItemInserted.
+     */
     fun addPokemon(pokemon: Pokemon) {
         datasetFiltered[pokemon.id] = pokemon
         dataset[pokemon.id] = pokemon
         notifyItemInserted(dataset.size - 1)
     }
 
+    /**
+     * Returns the ColorID of the type which matches the provided string.
+     */
     private fun getColorIDByType(typeString: String): Int {
         when (typeString) {
             "normal" -> return R.color.normal
@@ -116,6 +127,8 @@ class ItemAdapter(val context: Context) : RecyclerView.Adapter<ItemAdapter.ItemV
             "steel" -> return R.color.steel
             "fairy" -> return R.color.fairy
         }
+
+        //Type not found. return the default system color.
         return R.color.design_default_color_background
     }
 }
