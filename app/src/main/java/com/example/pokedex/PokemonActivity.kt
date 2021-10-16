@@ -1,11 +1,16 @@
 package com.example.pokedex
 
 
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.example.pokedex.ColorUtil.Companion.getColorIDByTypeString
 import com.example.pokedex.data.Pokemon
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.components.XAxis
@@ -65,11 +70,19 @@ class PokemonActivity : AppCompatActivity() {
             itemType2.text = pokemon.types[1].type.name
         }
 
+        //itemType2.setBackgroundColor(ContextCompat.getColor(this@PokemonActivity, type2ColorID))
+
 
         //Set the type's text-box color to the type's color.
-        setTypeBackgroundColor(itemType1, pokemon.types[0].type.name)
+
+        val type1Drawable : Drawable = itemType1.background
+        val type1ColorID = ColorUtil.getColorIDByTypeString(pokemon.types[0].type.name)
+        type1Drawable.mutate().setColorFilter(ContextCompat.getColor(this@PokemonActivity, type1ColorID), PorterDuff.Mode.SRC_IN)
+
         if (pokemon.types.size == 2) {
-            setTypeBackgroundColor(itemType2, pokemon.types[1].type.name)
+            val type2Drawable : Drawable = itemType2.background
+            val type2ColorID = ColorUtil.getColorIDByTypeString(pokemon.types[1].type.name)
+            type2Drawable.mutate().setColorFilter(ContextCompat.getColor(this@PokemonActivity, type2ColorID), PorterDuff.Mode.SRC_IN)
         }
 
     }
@@ -131,32 +144,5 @@ class PokemonActivity : AppCompatActivity() {
         })
         return data
     }
-
-
-    /** Gets a color from colors.xml which matches typeString. Assigns the color to provided type [TextView].*/
-    private fun setTypeBackgroundColor(type : TextView, typeString : String){
-        when(typeString) {
-            "normal" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.normal))
-            "fire" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.fire))
-            "water" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.water))
-            "electric" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.electric))
-            "grass" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.grass))
-            "ice" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.ice))
-            "fighting" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.fighting))
-            "poison" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.poison))
-            "ground" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.ground))
-            "flying" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.flying))
-            "psychic" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.psychic))
-            "bug" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.bug))
-            "rock" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.rock))
-            "ghost" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.ghost))
-            "dragon" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.dragon))
-            "dark" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.dark))
-            "steel" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.steel))
-            "fairy" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.fairy))
-        }
-    }
-
-
 
 }
