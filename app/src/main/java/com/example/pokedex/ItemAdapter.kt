@@ -1,6 +1,7 @@
 package com.example.pokedex
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -75,8 +76,9 @@ class ItemAdapter(val context: Context) : RecyclerView.Adapter<ItemAdapter.ItemV
                 item.name.replaceFirstChar { it.uppercase() })
 
         //Setting the background color of the item.
-        val colorID = ColorUtil.getColorIDByTypeString(item?.types[0].type.name)
-        holder.itemView.setBackgroundColor(ContextCompat.getColor(context, colorID))
+        var colorID = ColorUtil.getColorIDByTypeString(item?.types[0].type.name)
+        colorID = ColorUtil.lightenColor(ContextCompat.getColor(context, colorID), 0.2f)
+        holder.itemView.setBackgroundColor(colorID)
 
         //Assign the artwork for the item.
         val resID = context.resources.getIdentifier(

@@ -1,16 +1,12 @@
 package com.example.pokedex
 
-
-import android.graphics.ColorFilter
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.example.pokedex.ColorUtil.Companion.getColorIDByTypeString
 import com.example.pokedex.data.Pokemon
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.components.XAxis
@@ -62,8 +58,9 @@ class PokemonActivity : AppCompatActivity() {
         species.text = pokemon.species.speciesData.genera[7].genus
 
 
-        //Select an english flavortext.
-        val flavorTexts = pokemon.species.speciesData.flavorTextEntries
+        //Select a random English flavortext.
+        var flavorTexts = pokemon.species.speciesData.flavorTextEntries
+        flavorTexts = flavorTexts.shuffled()
         for (i in flavorTexts.indices) {
             if(flavorTexts[i].language.name == "en"){
                 flavorText.text = flavorTexts[i].flavorText.replace("\n", " ")
@@ -90,9 +87,6 @@ class PokemonActivity : AppCompatActivity() {
         }
 
     }
-
-
-
 
     /** Assigns required parameters to the Pokemon's stats chart. */
     private fun setStatChartParameters(){
