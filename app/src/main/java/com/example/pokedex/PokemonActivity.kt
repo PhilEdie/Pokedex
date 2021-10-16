@@ -16,16 +16,22 @@ import com.example.pokedex.data.Pokemon
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.IValueFormatter
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_pokemon.*
 import org.w3c.dom.Text
+import com.github.mikephil.charting.utils.ViewPortHandler
+
+
+
 
 class PokemonActivity : AppCompatActivity() {
 
@@ -71,8 +77,7 @@ class PokemonActivity : AppCompatActivity() {
 
         var stats : HorizontalBarChart = findViewById(R.id.pokemon_stats)
 
-        var barWidth : Float = 9f
-        var spacing : Float = 10f
+
 
         var hp = bundle_value.stats[5].baseStat.toFloat()
         var atk = bundle_value.stats[4].baseStat.toFloat()
@@ -91,8 +96,16 @@ class PokemonActivity : AppCompatActivity() {
 
         val barDataSet = BarDataSet(entries, "")
         barDataSet.setColors(*ColorTemplate.JOYFUL_COLORS)
+        barDataSet.valueTextSize = 13f
 
         val data = BarData(barDataSet)
+        data.setValueFormatter(object : ValueFormatter() {
+
+            override fun getFormattedValue(value: Float): String? {
+                return "" + value.toInt()
+            }
+
+        })
 
         stats.data = data
         initialiseStatsChart()
@@ -109,12 +122,16 @@ class PokemonActivity : AppCompatActivity() {
         stats.description.isEnabled = false
         stats.axisLeft.axisMaximum = 255f
         stats.axisLeft.axisMinimum = 0f
-
+        stats.axisLeft.isEnabled = false
+        stats.setTouchEnabled(false)
+        stats.isDragEnabled = false
+        stats.setScaleEnabled(false)
+        stats.setPinchZoom(false)
+        stats.xAxis.textSize = 13f
+        stats.animateY(500)
+        stats.xAxis.position = XAxis.XAxisPosition.BOTTOM
         val xAxisLabels = listOf(".", "Speed", "Sp.Def", "Sp.Atk", "Defense", "Attack", "HP")
         stats.xAxis.valueFormatter = IndexAxisValueFormatter(xAxisLabels)
-
-
-        stats.animateY(500)
         stats.invalidate()
     }
 
@@ -140,5 +157,7 @@ class PokemonActivity : AppCompatActivity() {
             "fairy" -> type.setBackgroundColor(ContextCompat.getColor(this,R.color.fairy))
         }
     }
+
+
 
 }

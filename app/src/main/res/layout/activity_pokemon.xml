@@ -70,6 +70,9 @@
 
 
     <com.github.mikephil.charting.charts.HorizontalBarChart
+
+        android:contextClickable="false"
+        android:clickable="false"
         android:id="@+id/pokemon_stats"
         android:layout_width="match_parent"
         android:layout_height="200dp"

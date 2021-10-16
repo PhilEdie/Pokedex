@@ -26,6 +26,7 @@ import okhttp3.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
@@ -87,7 +88,6 @@ class MainActivity : AppCompatActivity() {
                 print("inside onResponse, toReturn = " + pokemon.name)
                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                     itemAdapter.addPokemon(pokemon)
-                    //itemAdapter.datasetFiltered[pokemon.id] = pokemon
                     createSpecies(client, id)
                 })
 
@@ -100,27 +100,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun createSpecies(client: OkHttpClient, id : Int){
-        var speciesUrl = "https://pokeapi.co/api/v2/pokemon-species/" + id
-        var speciesRequest = Request.Builder()
-            .url(speciesUrl)
-            .build()
+        thread(start = true) {
+            var speciesUrl = "https://pokeapi.co/api/v2/pokemon-species/" + id
+            var speciesRequest = Request.Builder()
+                .url(speciesUrl)
+                .build()
 
-        client.newCall(speciesRequest).enqueue(object : Callback {
-
-            override fun onResponse(call: Call, response: Response) {
+            client.newCall(speciesRequest).execute().use { response ->
                 val body = response.body?.string()
                 val gson = GsonBuilder().create()
-                var species : SpeciesData = gson.fromJson(body, SpeciesData::class.java)
-                this@MainActivity.runOnUiThread(java.lang.Runnable {
-                    itemAdapter.dataset[id]?.species?.speciesData  = species
-                })
-
+                var species: SpeciesData = gson.fromJson(body, SpeciesData::class.java)
+                itemAdapter.dataset[id]?.species?.speciesData = species
             }
-
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-            }
-        })
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
