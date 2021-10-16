@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/pokemon_image"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         android:layout_gravity="center_horizontal"
         android:importantForAccessibility="no"
         android:scaleType="centerCrop"
@@ -22,8 +22,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:padding="16dp"
         android:textAppearance="?attr/textAppearanceHeadline6"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pokemon_image" />
 
@@ -32,55 +32,68 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:padding="16dp"
+        android:paddingTop="10dp"
         android:textAppearance="?attr/textAppearanceHeadline6"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pokemon_type1" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <TextView
         android:id="@+id/pokemon_flavortext"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:padding="16dp"
         android:textAppearance="?android:textAppearanceSmall"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pokemon_species" />
 
-    <TextView
-        android:id="@+id/pokemon_type1"
-        android:background="@drawable/rounded_corners"
-        android:backgroundTint="@color/design_default_color_background"
-        android:layout_width="109dp"
+    <LinearLayout
+        android:paddingTop="10dp"
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="10dp"
-        android:textAppearance="?attr/textAppearanceHeadline6"
-        app:layout_constraintEnd_toStartOf="@+id/pokemon_type2"
-        app:layout_constraintTop_toBottomOf="@+id/pokemon_image"/>
-
-    <TextView
-        android:id="@+id/pokemon_type2"
-        android:background="@drawable/rounded_corners"
-        android:backgroundTint="@color/design_default_color_background"
-        android:layout_width="109dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="10dp"
-        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pokemon_image"/>
+        app:layout_constraintTop_toBottomOf="@+id/pokemon_id_name">
 
+        <TextView
+            android:id="@+id/pokemon_type1"
+            android:layout_width="109dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corners"
+            android:backgroundTint="@color/design_default_color_background"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pokemon_id_name" />
+
+        <TextView
+            android:id="@+id/pokemon_type2"
+            android:layout_width="109dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corners"
+            android:backgroundTint="@color/design_default_color_background"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pokemon_id_name" />
+    </LinearLayout>
 
     <com.github.mikephil.charting.charts.HorizontalBarChart
 
-        android:contextClickable="false"
-        android:clickable="false"
         android:id="@+id/pokemon_stats"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:padding="16dp"
         android:layout_gravity="bottom"
+        android:clickable="false"
+        android:contextClickable="false"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pokemon_flavortext" />
 

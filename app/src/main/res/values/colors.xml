@@ -27,4 +27,11 @@
     <color name="steel">#B7B7CE</color>
     <color name="fairy">#D685AD</color>
 
+    <color name="hp">#F44336</color>
+    <color name="atk">#FF9800</color>
+    <color name="def">#FFC107</color>
+    <color name="spatk">#2196F3</color>
+    <color name="spdef">#4CAF50</color>
+    <color name="speed">#E91E63</color>
+
 </resources>

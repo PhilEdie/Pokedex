@@ -130,7 +130,14 @@ class PokemonActivity : AppCompatActivity() {
         entries.add(BarEntry(6f, speed))
 
         val barDataSet = BarDataSet(entries, "")
-        barDataSet.setColors(*ColorTemplate.JOYFUL_COLORS)
+        barDataSet.setColors(
+            ContextCompat.getColor(this@PokemonActivity, R.color.speed),
+            ContextCompat.getColor(this@PokemonActivity, R.color.spdef),
+            ContextCompat.getColor(this@PokemonActivity, R.color.spatk),
+            ContextCompat.getColor(this@PokemonActivity, R.color.def),
+            ContextCompat.getColor(this@PokemonActivity, R.color.atk),
+            ContextCompat.getColor(this@PokemonActivity, R.color.hp)
+            )
         barDataSet.valueTextSize = 13f
 
         val data = BarData(barDataSet)
