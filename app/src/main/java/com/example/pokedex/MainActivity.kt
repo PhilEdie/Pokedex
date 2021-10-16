@@ -31,6 +31,7 @@ import kotlin.concurrent.thread
 class MainActivity : AppCompatActivity() {
 
     private lateinit var itemAdapter: ItemAdapter
+    private lateinit var  searchView: SearchView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,9 +57,8 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 startActivity(intent)
-
+                searchView.clearFocus()
             }
-
         })
 
         getPokemonData()
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
 
         menuInflater.inflate(R.menu.menu_item,menu)
         val item = menu?.findItem(R.id.search_action)
-        val searchView = item?.actionView as SearchView
+        searchView = item?.actionView as SearchView
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
