@@ -1,4 +1,5 @@
 package com.example.pokedex
+
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -22,24 +23,31 @@ class MainActivity : AppCompatActivity() {
 
 
     private lateinit var itemAdapter: ItemAdapter
-    private lateinit var  searchView: SearchView
+    private lateinit var searchView: SearchView
+    private var searching: Boolean =
+        false     //Prevents items from being added to the filter when the user is searching.
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Initialize data.
-        itemAdapter = ItemAdapter(this@MainActivity)
+        itemAdapter = ItemAdapter(this@MainActivity, this)
 
         recycler_view.layoutManager = LinearLayoutManager(this)
-        itemAdapter.setOnItemClickListener(object : ItemAdapter.OnItemClickListener{
+
+        itemAdapter.setOnItemClickListener(object : ItemAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
 
                 val intent = Intent(this@MainActivity, PokemonActivity::class.java)
-                intent.putExtra("pokemon_extra", itemAdapter.datasetFiltered.toList()[position].second)
+                intent.putExtra(
+                    "pokemon_extra",
+                    itemAdapter.datasetFiltered.toList()[position].second
+                )
 
                 //Hiding the keyboard when entering next activity.
-                val imm : InputMethodManager = this@MainActivity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm: InputMethodManager =
+                    this@MainActivity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
                 val view = this@MainActivity.currentFocus
                 if (view != null) {
                     imm.hideSoftInputFromWindow(view.windowToken, 0)
@@ -61,17 +69,21 @@ class MainActivity : AppCompatActivity() {
     /**
      * Loops through all 898 Pokemon id's, calls [createPokemon] to create [Pokemon] objects.
      */
-    private fun getPokemonData(){
+    private fun getPokemonData() {
         val client = OkHttpClient()
-        for(id in 1..898) {
+        for (id in 1..898) {
             createPokemon(client, id)
         }
+    }
+
+    fun isSearching(): Boolean {
+        return searching
     }
 
     /**
      * Parses [Pokemon] object from PokeAPI. Adds the [Pokemon] object to the dataset.
      */
-    private fun createPokemon(client: OkHttpClient, id : Int){
+    private fun createPokemon(client: OkHttpClient, id: Int) {
         val pokemonUrl = "https://pokeapi.co/api/v2/pokemon/$id"
         val pokemonRequest = Request.Builder()
             .url(pokemonUrl)
@@ -98,7 +110,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Parses [SpeciesData] object from PokeAPI. adds [SpeciesData] to [Pokemon] object with the given id.
      */
-    fun createSpecies(client: OkHttpClient, id : Int){
+    fun createSpecies(client: OkHttpClient, id: Int) {
         thread(start = true) {
             val speciesUrl = "https://pokeapi.co/api/v2/pokemon-species/$id"
             val speciesRequest = Request.Builder()
@@ -119,32 +131,40 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
-        menuInflater.inflate(R.menu.menu_item,menu)
+        menuInflater.inflate(R.menu.menu_item, menu)
         val item = menu?.findItem(R.id.search_action)
 
         //Initialise searchView field.
         searchView = item?.actionView as SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
+
             override fun onQueryTextChange(newText: String?): Boolean {
                 //Reset the filter.
                 itemAdapter.datasetFiltered.clear()
                 //Make the search case insensitive.
                 val searchText = newText!!.lowercase(Locale.getDefault())
-                if(searchText.isNotEmpty()){
-                    //Select only Pokemon who's names contain the search string or who's id's match the search string.
-                    itemAdapter.dataset.forEach{
-                        if(it.value.name.contains(searchText) || it.key.toString().contentEquals(searchText)){
+                if (searchText.isNotEmpty()) {
+                    searching =
+                        true    //Currently searching, stop adding loaded items to the filter.
+                    //Select only Pokemon who's names start with the search string or who's id's match the search string.
+                    itemAdapter.dataset.forEach {
+                        //Initial
+                        if (it.value.name.startsWith(searchText) || it.key.toString()
+                                .contentEquals(searchText)
+                        ) {
                             itemAdapter.datasetFiltered[it.key] = it.value
                         }
                     }
-                    itemAdapter!!.notifyDataSetChanged()
+                    itemAdapter.notifyDataSetChanged()
                 } else {
+
                     //Add all Pokemon to the filter.
                     itemAdapter.datasetFiltered.putAll(itemAdapter.dataset)
                     itemAdapter.notifyDataSetChanged()
+                    searching = false   //Finished searching. safe to add loaded items to filter.
                 }
                 return false
             }

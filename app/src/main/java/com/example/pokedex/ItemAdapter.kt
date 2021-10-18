@@ -10,19 +10,21 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pokedex.data.Pokemon
+import java.util.*
+import kotlin.collections.HashMap
 
 
 /**
  * Adapter for the [RecyclerView] in [MainActivity]. Displays [Pokemon] data object.
  */
-class ItemAdapter(val context: Context) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
+class ItemAdapter(val context: Context, val mainActivity: MainActivity) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
     /** The complete dataset containing all [Pokemon] objects.*/
-    val dataset: HashMap<Int, Pokemon> = HashMap<Int, Pokemon>()
+    val dataset: TreeMap<Int, Pokemon> = TreeMap<Int, Pokemon>()
 
     /** Tracks which Pokemon should be displayed. The filter changes depending on what's
      * in the search bar.*/
-    val datasetFiltered: HashMap<Int, Pokemon> = HashMap<Int, Pokemon>()
+    val datasetFiltered: TreeMap<Int, Pokemon> = TreeMap<Int, Pokemon>()
 
     //Setting up the OnClickListener:
     private lateinit var mListener: OnItemClickListener
@@ -67,7 +69,7 @@ class ItemAdapter(val context: Context) : RecyclerView.Adapter<ItemAdapter.ItemV
      * Replace the contents of a view (invoked by the layout manager)
      */
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-
+        holder.itemView
         //Get the Pokemon attached to the item.
         val item = datasetFiltered.toList()[position].second
 
@@ -94,14 +96,20 @@ class ItemAdapter(val context: Context) : RecyclerView.Adapter<ItemAdapter.ItemV
      * Return the size of your dataset (invoked by the layout manager)
      */
     override fun getItemCount() = datasetFiltered.size
+    override fun getItemId(position: Int) = position.toLong()
+    override fun getItemViewType(position: Int) = position
+
 
     /**
      * Loads new [Pokemon] objects into the dataset and the filter. Updates the UI
      * by calling notifyItemInserted.
      */
     fun addPokemon(pokemon: Pokemon) {
-        datasetFiltered[pokemon.id] = pokemon
+
         dataset[pokemon.id] = pokemon
+        if(!mainActivity.isSearching()) {
+            datasetFiltered[pokemon.id] = pokemon
+        }
         notifyItemInserted(dataset.size - 1)
     }
 
